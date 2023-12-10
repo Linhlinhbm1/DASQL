@@ -15,7 +15,10 @@ or city like 'u%'
 select distinct city from station
 where city like '%a' or city like '%e' or city like '%i' or city like '%o'
 or city like '%u'
-
+-- baitap6-
+select distinct city from station
+where city not like 'a%' and city not like 'e%' and city not like 'i%' 
+and city not like 'o%' and city not like  'u%'
 
 --baitap7--
 select name from employee 
@@ -41,7 +44,8 @@ order by author_id
 SELECT part, assembly_step FROM parts_assembly
 where finish_date is null
 -- baitap 14--
-
+select * from lyft_drivers
+where  yearly_salary < 30000 or yearly_salary >=70000
 
 --baitap15
 select advertising_channel from uber_advertising
