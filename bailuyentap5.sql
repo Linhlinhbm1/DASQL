@@ -6,13 +6,11 @@ inner join country as b
 on a.countrycode=b.code
 group by b.continent
 --baitap2--
-SELECT ROUND(sum(CASE 
-    WHEN b.signup_action = 'Confirmed'
-     THEN 1
-    ELSE 0
-    END)::DECIMAL / count(*), 2)
+SELECT 
+ROUND (CAST(sum(CASE WHEN b.signup_action = 'Confirmed' THEN 1 ELSE 0 END) as decimal)  / count(*) , 2)
 FROM emails AS a
-INNER JOIN texts AS b ON a.email_id = b.email_id
+INNER JOIN texts AS b 
+ON a.email_id = b.email_id
 --baitap3--
 SELECT 
     b.age_bucket,
