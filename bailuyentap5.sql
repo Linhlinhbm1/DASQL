@@ -25,3 +25,14 @@ on a.product_id=b.product_id
 group by a.customer_id
 having count (DISTINCT b.product_category) =3
 
+--baitap5--
+select  a.product_name,
+sum(unit) as unit                        
+from Products as a
+inner join Orders as b
+on a.product_id = b.product_id 
+where month(b.order_date )=2
+group by a.product_name
+having sum(unit) >=100 
+
+
