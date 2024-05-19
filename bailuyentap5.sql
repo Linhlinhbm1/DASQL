@@ -5,6 +5,7 @@ from city as a
 inner join country as b
 on a.countrycode=b.code
 group by b.continent
+    
 --baitap2--
 SELECT 
 ROUND (CAST(sum(CASE WHEN b.signup_action = 'Confirmed' THEN 1 ELSE 0 END) as decimal)  / count(*) , 2)
@@ -30,6 +31,14 @@ group by a.customer_id
 having count (DISTINCT b.product_category) =3
 
 --baitap5--
+select 
+a.employee_id,
+a.name, count(distinct b.name ) as reports_count,
+ceiling( avg (b.age ) ) as average_age 
+from Employees as a
+join Employees as b
+on a.employee_id =b.reports_to 
+group by a.employee_id
     
 --baitap6--
 select  a.product_name,
