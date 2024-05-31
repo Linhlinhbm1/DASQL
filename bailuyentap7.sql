@@ -33,6 +33,9 @@ group by user_id, transaction_date
 ORDER BY transaction_date
 --BAITAP5--
 
+--baitap6--
+
+ 
 -- baitap7--
 with cte1 as
 (SELECT CATEGORY,PRODUCT,SUM(SPEND) AS TOTAL_SPEND,
