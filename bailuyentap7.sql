@@ -32,9 +32,27 @@ where rank_id =1
 group by user_id, transaction_date
 ORDER BY transaction_date
 --BAITAP5--
+SELECT user_id, tweet_date,
+case 
+   WHEN lag(tweet_count) over(PARTITION BY user_id order by tweet_date) is null
+       and  lag(tweet_count,2) over(PARTITION BY user_id order by tweet_date) is null then round(tweet_count,2)
+   WHEN lag(tweet_count) over(PARTITION BY user_id order by tweet_date) is not null
+       and lag(tweet_count,2) over(PARTITION BY user_id order by tweet_date) is null then 
+       round ( (tweet_count+ lag(tweet_count) over(PARTITION BY user_id order by tweet_date))::decimal/2 ,2 )
+    else round ((tweet_count+lag(tweet_count) over(PARTITION BY user_id order by tweet_date)+
+               lag(tweet_count,2) over(PARTITION BY user_id order by tweet_date))::decimal /3,2)
+    end as rolling_avg_3d
+FROM tweets
 
 --baitap6--
-
+with cte1 as 
+(SELECT 
+merchant_id, credit_card_id,  amount,
+EXTRACT( hour from transaction_timestamp - lag(transaction_timestamp) over (PARTITION BY merchant_id, credit_card_id,  amount))*60+
+EXTRACT(minute from transaction_timestamp - lag(transaction_timestamp) over (PARTITION BY merchant_id, credit_card_id,  amount)) as time
+FROM transactions)
+select count(*) payment_count from cte1
+where time BETWEEN 0 and 10
  
 -- baitap7--
 with cte1 as
