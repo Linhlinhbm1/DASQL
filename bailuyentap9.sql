@@ -81,8 +81,35 @@ select * from sales_dataset_rfm_prj
 where QUANTITYORDERED < (select min_value from cte1) or QUANTITYORDERED > (select max_value from cte1)
 
 
+with cte1 as
+(select *,
+(select avg(QUANTITYORDERED) from sales_dataset_rfm_prj) as avg,
+(select stddev( QUANTITYORDERED) from sales_dataset_rfm_prj) as stddev
+from sales_dataset_rfm_prj) 
+select *, (QUANTITYORDERED- avg)/ stddev as z_score from cte1
+where abs((QUANTITYORDERED- avg)/ stddev) > 3
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 
 
 
