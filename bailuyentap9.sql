@@ -67,3 +67,28 @@ set QTR_ID  = case
 where QTR_ID  is null
 
 
+--5--
+with cte1 as (
+select Q1-1.5*IQR as min_value,
+	Q3 + 1.5*IQR as max_value
+from (
+select
+percentile_cont(0.25) within group ( order by QUANTITYORDERED ) as Q1 
+percentile_cont(0.75) within group ( order by QUANTITYORDERED ) as Q3 
+percentile_cont(0.75) within group ( order by QUANTITYORDERED ) - percentile_cont(0.25) within group ( order by QUANTITYORDERED ) as IQR 
+from sales_dataset_rfm_prj) as a)
+select * from sales_dataset_rfm_prj 
+where QUANTITYORDERED < (select min_value from cte1) or QUANTITYORDERED > (select max_value from cte1)
+
+
+
+
+
+
+
+
+
+
+
+
+
