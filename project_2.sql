@@ -57,6 +57,36 @@ from bigquery-public-data.thelook_ecommerce.products as a
  order by 2
 
 
+--ii--
+With category_data as
+(
+Select 
+FORMAT_DATE('%Y-%m', t1.created_at) as Month,
+FORMAT_DATE('%Y', t1.created_at) as Year,
+t2.category as Product_category,
+round(sum(t3.sale_price),2) as TPV,
+count( t3.order_id) as TPO,
+round(sum(t2.cost),2) as Total_cost
+from bigquery-public-data.thelook_ecommerce.orders as t1 
+Join bigquery-public-data.thelook_ecommerce.products as t2 on t1.order_id=t2.id 
+Join bigquery-public-data.thelook_ecommerce.order_items as t3 on t2.id=t3.id
+where t3.delivered_at is not null and t3.status = 'Complete'
+Group by Month, Year, Product_category
+)
+Select Month, Year, Product_category, TPV, TPO,
+round(cast((TPV - lag(TPV) OVER(PARTITION BY Product_category ORDER BY Year, Month))
+      /lag(TPV) OVER(PARTITION BY Product_category ORDER BY Year, Month) as Decimal)*100.00,2) || '%'
+       as Revenue_growth,
+round(cast((TPO - lag(TPO) OVER(PARTITION BY Product_category ORDER BY Year, Month))
+      /lag(TPO) OVER(PARTITION BY Product_category ORDER BY Year, Month) as Decimal)*100.00,2) || '%'
+       as Order_growth,
+Total_cost,
+round(TPV - Total_cost,2) as Total_profit,
+round((TPV - Total_cost)/Total_cost,2) as Profit_to_cost_ratio
+from category_data
+Order by Product_category, Year, Month
+
+
 
 
 
