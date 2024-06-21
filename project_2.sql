@@ -42,6 +42,19 @@ select * from cte2
 where rank_per_month <=5
 order by month_year asc , rank_per_month asc 
 
+--5--
+
+with cte1 as (
+select a.category as category,FORMAT_DATE('%Y-%m-%d', b.delivered_at) as dates, b.sale_price as sale_price
+from bigquery-public-data.thelook_ecommerce.products as a
+ join bigquery-public-data.thelook_ecommerce.order_items as b
+ on a.id=b.id
+ where FORMAT_DATE('%Y-%m-%d', b.delivered_at) between '2022-01-15' and '2022-04-15')
+ select category,dates,
+ sum(sale_price) as revenue from cte1
+ group by 1,2
+ order by 2
+
 
 
 
