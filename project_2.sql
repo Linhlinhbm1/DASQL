@@ -27,6 +27,49 @@ from bigquery-public-data.thelook_ecommerce.users
 where  FORMAT_DATE('%Y-%m', created_at) between '2019-01'and '2022-04' and age in (12,70)
 order by 3,4
 
+ With female_age as 
+(
+select min(age) as min_age, max(age) as max_age
+from bigquery-public-data.thelook_ecommerce.users
+Where gender='F' and created_at BETWEEN '2019-01-01 00:00:00' AND '2022-05-01 00:00:00'
+),
+male_age as 
+(
+select min(age) as min_age, max(age) as max_age
+from bigquery-public-data.thelook_ecommerce.users
+Where gender='M' and created_at BETWEEN '2019-01-01 00:00:00' AND '2022-05-01 00:00:00'
+),
+young_old_group as 
+(
+Select t1.first_name, t1.last_name, t1.gender, t1.age
+from bigquery-public-data.thelook_ecommerce.users as t1
+Join female_age as t2 on t1.age=t2.min_age or t1.age=t2.max_age
+Where t1.gender='F'and created_at BETWEEN '2019-01-01 00:00:00' AND '2022-05-01 00:00:00'
+UNION ALL
+Select t3.first_name, t3.last_name, t3.gender, t3.age
+from bigquery-public-data.thelook_ecommerce.users as t3
+Join female_age as t4 on t3.age=t4.min_age or t3.age=t4.max_age
+Where t3.gender='M' and created_at BETWEEN '2019-01-01 00:00:00' AND '2022-05-01 00:00:00'
+),
+age_tag as
+(
+Select *, 
+Case 
+     when age in (select min(age) as min_age
+     from bigquery-public-data.thelook_ecommerce.users
+     Where gender='F' and created_at BETWEEN '2019-01-01 00:00:00' AND '2022-05-01 00:00:00') then 'Youngest'
+     when age in (select min(age) as min_age
+     from bigquery-public-data.thelook_ecommerce.users
+     Where gender='M'and created_at BETWEEN '2019-01-01 00:00:00' AND '2022-05-01 00:00:00') then 'Youngest'
+     Else 'Oldest'
+END as tag
+from young_old_group 
+)
+Select gender, tag, count(*) as user_count
+from age_tag
+group by gender, tag
+
+
 --4--
 
 with cte1 as (
