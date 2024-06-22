@@ -1,20 +1,20 @@
 --1--
 select 
-count(order_id) as total_order,
+count( order_id) as total_order,
 count(distinct user_id) as total_user,
 FORMAT_DATE('%Y-%m', delivered_at) as month_year
 from bigquery-public-data.thelook_ecommerce.order_items
-where FORMAT_DATE('%Y-%m', delivered_at) between '2019-01'and '2022-04' 
+where FORMAT_DATE('%Y-%m', delivered_at) between '2019-01'and '2022-04' and status = 'Complete'
 group by 3
 order by 3
 
 --2--
  
 select count(distinct user_id) as distinct_users,
-sum(sale_price )/count(order_id) as average_order_value,
+round(sum(sale_price )/count(order_id),2) as average_order_value,
 FORMAT_DATE('%Y-%m', delivered_at) as month_year
 from bigquery-public-data.thelook_ecommerce.order_items
-where FORMAT_DATE('%Y-%m', delivered_at) between '2019-01'and '2022-04' 
+where FORMAT_DATE('%Y-%m', delivered_at) between '2019-01-01 00:00:00'and '2022-05-01 00:00:00' 
 group by 3
 order by 3
 
@@ -79,7 +79,7 @@ FORMAT_DATE('%Y-%m', b.delivered_at) as month_year
 from bigquery-public-data.thelook_ecommerce.inventory_items as a
 join bigquery-public-data.thelook_ecommerce.order_items as b on a.id=b.id
 join bigquery-public-data.thelook_ecommerce.products as c on a.id=c.id
-where FORMAT_DATE('%Y-%m', b.delivered_at) is not null and b.status ='Complete'
+where  b.status ='Complete'
 group by 2,3,4),
 cte2 as (
 select *, dense_rank() over (partition by month_year order by profit desc ) as rank_per_month from cte1)
